@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dự đoán mức béo phì</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>DỰ ĐOÁN MỨC ĐỘ BÉO PHÌ</h1>
+<form action="/predict" method="POST">
+    <div class="form-grid">
+        <div>
+            <label>Tuổi</label>
+            <input type="number" name="Age" required>
+        </div>
+        <div>
+            <label>Giới tính</label>
+            <select name="Gender" required>
+                <option value="Male">Nam</option>
+                <option value="Female">Nữ</option>
+            </select>
+        </div>
+        <div>
+            <label>Chiều cao (cm)</label>
+            <input type="number" step="0.1" name="Height" required>
+        </div>
+        <div>
+            <label>Cân nặng (kg)</label>
+            <input type="number" step="0.1" name="Weight" required>
+        </div>
+
+        <div>
+            <label>Gia đình thừa cân</label>
+            <select name="family_history_with_overweight" required>
+                <option value="yes">Có</option>
+                <option value="no">Không</option>
+            </select>
+        </div>
+        <div>
+            <label>FCVC (Số bữa ăn rau/ngày)</label>
+            <input type="number" step="0.1" name="FCVC" required>
+        </div>
+        <div>
+            <label>NCP (Số bữa chính/ngày)</label>
+            <input type="number" step="0.1" name="NCP" required>
+        </div>
+        <div>
+            <label>FAVC (Ăn thực phẩm nhiều calo)</label>
+            <select name="FAVC" required>
+                <option value="yes">Có</option>
+                <option value="no">Không</option>
+            </select>
+        </div>
+
+        <div>
+            <label>CAEC (Ăn vặt giữa bữa)</label>
+            <select name="CAEC" required>
+                <option value="no">Không</option>
+                <option value="Sometimes">Thỉnh thoảng</option>
+                <option value="Frequently">Thường xuyên</option>
+            </select>
+        </div>
+        <div>
+            <label>CALC (Uống rượu)</label>
+            <select name="CALC" required>
+                <option value="no">Không</option>
+                <option value="Sometimes">Thỉnh thoảng</option>
+                <option value="Frequently">Thường xuyên</option>
+            </select>
+        </div>
+        <div>
+            <label>SCC (Theo dõi calo)</label>
+            <select name="SCC" required>
+                <option value="yes">Có</option>
+                <option value="no">Không</option>
+            </select>
+        </div>
+        <div>
+            <label>FAF (Tần suất hoạt động thể chất/tuần)</label>
+            <input type="number" step="0.1" name="FAF" required>
+        </div>
+
+        <div>
+            <label>TUE (Thời gian dùng thiết bị công nghệ /giờ)</label>
+            <input type="number" step="0.1" name="TUE" required>
+        </div>
+        <div>
+            <label>SMOKE (Hút thuốc)</label>
+            <select name="SMOKE" required>
+                <option value="yes">Có</option>
+                <option value="no">Không</option>
+            </select>
+        </div>
+        <div>
+            <label>CH2O (Lượng nước uống / lít)</label>
+            <input type="number" step="0.1" name="CH2O" required>
+        </div>
+        <div>
+            <label>MTRANS (Phương tiện di chuyển)</label>
+            <select name="MTRANS" required>
+                <option value="Walking">Đi bộ</option>
+                <option value="Bike">Xe đạp</option>
+                <option value="Motorbike">Xe máy</option>
+                <option value="Public_Transport">Phương tiện công cộng</option>
+                <option value="Car">Ô tô</option>
+            </select>
+        </div>
+    </div>
+
+    <button type="submit">Dự đoán</button>
+</form>
+        {% if result %}
+    {% if result == "Thiếu cân" %}
+        <div class="result" style="background-color: #ffcccc; border-color: #ff0000;">
+            Cảnh báo: Bạn đang ({{ result }})! Hãy chú ý chế độ dinh dưỡng.
+        </div>
+    {% elif result == "Bình thường" %}
+        <div class="result" style="background-color: #ccffcc; border-color: #00aa00;">
+            Chúc mừng! Mức cân nặng của bạn ({{ result }}).
+        </div>
+    {% elif result in ["Thừa cân cấp I", "Thừa cân cấp II"] %}
+        <div class="result" style="background-color: #fff4cc; border-color: #ff9900;">
+            Cảnh báo nhẹ: Bạn đang ({{ result }}). Nên theo dõi chế độ ăn và tập luyện.
+        </div>
+    {% elif result in ["Béo phì cấp I", "Béo phì cấp II", "Béo phì cấp III"] %}
+        <div class="result" style="background-color: #ffcccc; border-color: #ff0000;">
+            Cảnh báo: Bạn đang ({{ result }}). Cần thay đổi chế độ ăn và sinh hoạt ngay.
+        </div>
+    {% else %}
+        <div class="result">
+            Kết quả: {{ result }}
+        </div>
+    {% endif %}
+{% endif %}
+{% if eval_metrics %}
+<div class="model-eval">
+    <h3>Đánh giá mô hình</h3>
+    <p>Accuracy: {{ eval_metrics['accuracy']|round(4) }}</p>
+    <pre>{{ eval_metrics['report'] }}</pre>
+</div>
+{% endif %}
+
+    </div>
+</body>
+</html>
