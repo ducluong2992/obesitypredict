@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá mô hình C4.5</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>ĐÁNH GIÁ MÔ HÌNH C4.5</h1>
+
+        <div class="accuracy-summary">
+            <p><strong>Accuracy (5-fold):</strong> {{ mean_accuracy }}%</p>
+        </div>
+        {% for fold in folds %}
+        <div class="report-section">
+            <h2 class="report-title">Fold {{ fold.number }}</h2>
+            <p><strong>Accuracy:</strong> {{ fold.accuracy }}%</p>
+            <pre class="classification-report">{{ fold.report }}</pre>
+        </div>
+        {% endfor %}
+
+    </div>
+</body>
+</html>
