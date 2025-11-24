@@ -1,5 +1,5 @@
 import pandas as pd
-from c45 import build_tree,predict
+from ml.c45 import build_tree,predict
 from sklearn.model_selection import KFold
 from sklearn.metrics import classification_report, accuracy_score
 import joblib

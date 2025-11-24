@@ -1,23 +1,18 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-#1. Tải dữ liệu
-try:
-    df = pd.read_csv('ObesityDataSet_raw_and_data_sinthetic.csv')
-except FileNotFoundError:
-    print("Lỗi: Không tìm thấy file 'ObesityDataSet_raw_and_data_sinthetic.csv'. Vui lòng kiểm tra đường dẫn.")
-    exit()
+df = pd.read_csv('Obesity_cleaned.csv')
 
+#Mã hóa dữ liệu
 
-# 2. Mã hóa Dữ liệu Danh mục Có Thứ tự (Ordinal Label Encoding)
-# CAEC (Ăn vặt giữa bữa)
+#category có thứ tự sang số
 caec_mapping = {'no': 0, 'Sometimes': 1, 'Frequently': 2, 'Always': 3}
 df['CAEC_Encoded'] = df['CAEC'].map(caec_mapping)
-# CALC (Uống rượu)
-calc_mapping = {'no': 0, 'Sometimes': 1, 'Frequently': 2, 'Always': 3} # Lưu ý: Dữ liệu mẫu chỉ có 'no', 'Sometimes', 'Frequently'
+
+calc_mapping = {'no': 0, 'Sometimes': 1, 'Frequently': 2, 'Always': 3} 
 df['CALC_Encoded'] = df['CALC'].map(calc_mapping)
 
-# NObeyesdad (Nhãn Mục tiêu) - Đây là bước quan trọng
+# mã hóa nhãn NObeyesdad
 nobeyesdad_mapping = {
     'Insufficient_Weight': 0,
     'Normal_Weight': 1,
@@ -29,43 +24,22 @@ nobeyesdad_mapping = {
 }
 df['NObeyesdad_Encoded'] = df['NObeyesdad'].map(nobeyesdad_mapping)
 
-#3. Mã hóa Dữ liệu Danh mục Không Thứ tự (Nominal Label Encoding)
+#category không có thứ tự
 
-# Các cột cần dùng LabelEncoder (Binary và Nominal)
-nominal_cols = [
-    'Gender', 
-    'FAVC', 
-    'SCC', 
-    'SMOKE', 
-    'family_history_with_overweight', 
-    'MTRANS'
-]
-
-le = LabelEncoder()
-
+nominal_cols = [ 'Gender', 'FAVC', 'SCC', 'SMOKE', 'family_history_with_overweight', 'MTRANS']
+le = LabelEncoder()  #encode bằng LabelEncoder
 for col in nominal_cols:
     df[f'{col}_Encoded'] = le.fit_transform(df[col])
     print(f"Mã hóa cho cột {col}: {dict(zip(le.classes_, le.transform(le.classes_)))}")
 
-# 4. Chuẩn bị Dữ liệu Cuối cùng
-
-# Danh sách các cột đã được mã hóa (Features)
+#chuẩn bị dữ liệu sau mã hóa
 features_encoded = [
-    'Age', 'Height', 'Weight', 'FCVC', 'NCP', 'FAF', 'TUE', 'CH2O', # Số
+    'Age', 'Height', 'Weight', 'FCVC', 'NCP', 'FAF', 'TUE', 'CH2O', 
     'Gender_Encoded', 'family_history_with_overweight_Encoded', 'FAVC_Encoded',
     'CAEC_Encoded', 'CALC_Encoded', 'SCC_Encoded', 'SMOKE_Encoded', 'MTRANS_Encoded'
 ]
+df_encoded = df[features_encoded + ['NObeyesdad_Encoded']].copy() 
 
-# Tạo DataFrame chỉ chứa các cột đã được xử lý
-df_encoded = df[features_encoded + ['NObeyesdad_Encoded']].copy()
-
-# ----------------------------------------------------------------------
-## 5. In kết quả và Lưu file (Tùy chọn)
-# ----------------------------------------------------------------------
-
-print("\n--- 5 Hàng Dữ liệu sau khi Mã hóa ---")
-print(df_encoded.head())
-
-# Lưu file đã mã hóa để sử dụng cho việc huấn luyện mô hình
+#kết quả
 df_encoded.to_csv('ObesityDataSet_encoded.csv', index=False)
 print("\nĐã lưu dữ liệu đã mã hóa vào file: ObesityDataSet_encoded.csv")
